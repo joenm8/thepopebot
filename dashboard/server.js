@@ -316,7 +316,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = process.env.DASHBOARD_PORT || 3001;
+const PORT = process.env.PORT || process.env.DASHBOARD_PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Tin Alley Dashboard running on http://localhost:${PORT}`);
 });
