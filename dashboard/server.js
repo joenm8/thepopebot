@@ -317,6 +317,7 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || process.env.DASHBOARD_PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Tin Alley Dashboard running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`Tin Alley Dashboard running on http://${HOST}:${PORT}`);
 });
