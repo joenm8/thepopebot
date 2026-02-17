@@ -1259,6 +1259,30 @@ async function renderSources() {
               <p class="text-sm font-mono">PDL_API_KEY=your_key</p>
               <p class="text-sm text-muted" style="margin-top:4px">Sign up: peopledatalabs.com/signup</p>
             </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--green);margin-bottom:8px;font-size:14px">Google News RSS (Free)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">Unlimited free news monitoring. No auth needed. Supplements Serper for news.</p>
+              <p class="text-sm font-mono" style="color:var(--green)">No env vars needed</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Uses news.google.com/rss</p>
+            </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--green);margin-bottom:8px;font-size:14px">Y Combinator Companies (Free)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">Check if alumni companies are YC-backed. Free public API.</p>
+              <p class="text-sm font-mono" style="color:var(--green)">No env vars needed</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Uses yc-oss.github.io/api</p>
+            </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--green);margin-bottom:8px;font-size:14px">OpenCorporates (Free)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">200 free searches/month. Global company registration data incl. ASIC.</p>
+              <p class="text-sm font-mono" style="color:var(--green)">No env vars needed (optional key for higher limits)</p>
+              <p class="text-sm text-muted" style="margin-top:4px">API: opencorporates.com</p>
+            </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--accent);margin-bottom:8px;font-size:14px">Apollo.io People Search</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">600 free people searches/day. Detect career changes &amp; discover founders.</p>
+              <p class="text-sm font-mono">APOLLO_API_KEY=your_key</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Sign up: apollo.io</p>
+            </div>
           </div>
         </div>
       </div>

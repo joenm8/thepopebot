@@ -20,6 +20,10 @@ const alumniDiscovery = require('./alumni-discovery');
 const hackernews = require('./hackernews');
 const producthunt = require('./producthunt');
 const enrichment = require('./enrichment');
+const googleNewsRSS = require('./google-news-rss');
+const ycCompanies = require('./yc-companies');
+const opencorporates = require('./opencorporates');
+const apollo = require('./apollo');
 
 const sources = {
   linkedin,
@@ -32,6 +36,10 @@ const sources = {
   hackernews,
   producthunt,
   enrichment,
+  google_news_rss: googleNewsRSS,
+  yc_companies: ycCompanies,
+  opencorporates,
+  apollo,
 };
 
 /**
