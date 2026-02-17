@@ -50,5 +50,23 @@
     "type": "agent",
     "job": "Read the file at operating_system/FINANCIAL_ADVISOR/FINANCIAL_ADVISOR.md and complete the tasks described there.",
     "enabled": true
+  },
+  {
+    "name": "alumni-pipeline-scan",
+    "schedule": "0 */6 * * *",
+    "type": "http",
+    "url": "http://localhost:3001/api/pipeline/run",
+    "method": "POST",
+    "vars": { "sources": null, "dryRun": false },
+    "enabled": true
+  },
+  {
+    "name": "alumni-discovery",
+    "schedule": "0 8 * * *",
+    "type": "http",
+    "url": "http://localhost:3001/api/discover",
+    "method": "POST",
+    "vars": { "maxQueries": 10 },
+    "enabled": true
   }
 ]
