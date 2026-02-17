@@ -1235,6 +1235,24 @@ async function renderSources() {
               <p class="text-sm font-mono">GITHUB_TOKEN=ghp_xxx (optional)</p>
               <p class="text-sm text-muted" style="margin-top:4px">Create: github.com/settings/tokens</p>
             </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--green);margin-bottom:8px;font-size:14px">Hacker News (Free)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">Completely free. No auth needed. Monitors HN for company mentions.</p>
+              <p class="text-sm font-mono" style="color:var(--green)">No env vars needed</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Uses hn.algolia.com/api</p>
+            </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--accent);margin-bottom:8px;font-size:14px">Product Hunt</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">500 free requests/day. Detects product launches.</p>
+              <p class="text-sm font-mono">PRODUCTHUNT_TOKEN=your_token</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Get token: producthunt.com/v2/oauth/applications</p>
+            </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--green);margin-bottom:8px;font-size:14px">Alumni Discovery (Serper)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">Uses your Serper key to find UniMelb alumni founders via Google.</p>
+              <p class="text-sm font-mono">SERPER_API_KEY=your_key</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Go to Discover Alumni page to run searches</p>
+            </div>
           </div>
         </div>
       </div>

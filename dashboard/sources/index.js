@@ -17,6 +17,8 @@ const crunchbase = require('./crunchbase');
 const companyRegistry = require('./company-registry');
 const webMonitor = require('./web-monitor');
 const alumniDiscovery = require('./alumni-discovery');
+const hackernews = require('./hackernews');
+const producthunt = require('./producthunt');
 
 const sources = {
   linkedin,
@@ -26,6 +28,8 @@ const sources = {
   company_registry: companyRegistry,
   web_monitor: webMonitor,
   alumni_discovery: alumniDiscovery,
+  hackernews,
+  producthunt,
 };
 
 /**
