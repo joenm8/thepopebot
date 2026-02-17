@@ -69,4 +69,6 @@ const API = {
   getSources: () => API.get('/api/sources'),
   getPipelineRuns: () => API.get('/api/pipeline/runs'),
   runPipeline: (sources, dryRun) => API.post('/api/pipeline/run', { sources, dryRun }),
+  runDiscovery: (maxQueries) => API.post('/api/discover', { maxQueries }),
+  importDiscovered: (candidates) => API.post('/api/discover/import', { candidates }),
 };

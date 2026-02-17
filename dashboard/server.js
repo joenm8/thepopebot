@@ -8,6 +8,7 @@ const { db, queries } = require('./db');
 const { addSignal, recalculateAllScores, generateDigest, checkTenureMilestones } = require('./signals');
 const { getSourceStatus } = require('./sources');
 const { runPipeline, getPipelineRuns } = require('./pipeline');
+const alumniDiscovery = require('./sources/alumni-discovery');
 
 const app = express();
 app.use(express.json());
@@ -308,6 +309,90 @@ app.post('/api/pipeline/run', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── Alumni Discovery ────────────────────────────────────────────────────────
+
+app.post('/api/discover', async (req, res) => {
+  if (!alumniDiscovery.isConfigured()) {
+    return res.status(400).json({ error: 'SERPER_API_KEY not configured. Set it as an environment variable.' });
+  }
+
+  const { maxQueries } = req.body;
+  try {
+    const results = await alumniDiscovery.discover({
+      maxQueries: maxQueries || null,
+      verbose: true,
+    });
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/discover/import', (req, res) => {
+  const { candidates } = req.body;
+  if (!candidates || !Array.isArray(candidates) || candidates.length === 0) {
+    return res.status(400).json({ error: 'No candidates provided' });
+  }
+
+  let imported = 0;
+  let skipped = 0;
+  const errors = [];
+
+  const importTransaction = db.transaction((candidates) => {
+    for (const c of candidates) {
+      try {
+        if (!c.first_name || !c.last_name) {
+          skipped++;
+          errors.push(`Missing name: ${JSON.stringify(c).slice(0, 80)}`);
+          continue;
+        }
+
+        // Check for duplicate by linkedin_url
+        if (c.linkedin_url) {
+          const existing = db.prepare('SELECT id FROM alumni WHERE linkedin_url = ?').get(c.linkedin_url);
+          if (existing) {
+            skipped++;
+            continue;
+          }
+        }
+
+        // Check for duplicate by name
+        const existingName = db.prepare(
+          'SELECT id FROM alumni WHERE LOWER(first_name) = LOWER(?) AND LOWER(last_name) = LOWER(?)'
+        ).get(c.first_name, c.last_name);
+        if (existingName) {
+          skipped++;
+          continue;
+        }
+
+        queries.insertAlumni.run({
+          first_name: c.first_name,
+          last_name: c.last_name,
+          email: c.email || null,
+          linkedin_url: c.linkedin_url || null,
+          location_city: c.location_city || null,
+          location_country: c.location_country || null,
+          graduation_year: c.graduation_year || null,
+          degree: c.degree || null,
+          faculty: c.faculty || null,
+          current_company: c.current_company || null,
+          current_title: c.current_title || null,
+          category: c.category || 'watching',
+          notes: c.notes || null,
+          tags: c.tags || null,
+        });
+        imported++;
+      } catch (err) {
+        skipped++;
+        errors.push(err.message);
+      }
+    }
+  });
+
+  importTransaction(candidates);
+  res.json({ imported, skipped, total: candidates.length, errors: errors.slice(0, 10) });
 });
 
 // ── Serve dashboard ─────────────────────────────────────────────────────────

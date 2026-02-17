@@ -33,6 +33,7 @@ function navigate(page) {
     case 'leaders': renderAlumniList('leader'); break;
     case 'watching': renderAlumniList('watching'); break;
     case 'all-alumni': renderAlumniList(null); break;
+    case 'discover': renderDiscover(); break;
     case 'import': renderImport(); break;
     case 'sources': renderSources(); break;
     default: renderOverview();
@@ -421,6 +422,230 @@ function renderDigestContent(digest) {
   }
 
   return html;
+}
+
+// ── Discover Page ────────────────────────────────────────────────────────────
+
+let discoveryResults = null;
+
+async function renderDiscover() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <h2>Discover Alumni</h2>
+        <p class="text-sm text-muted" style="margin-top:4px">Search Google for UniMelb CS/Engineering alumni who are founders (via Serper.dev)</p>
+      </div>
+      <div class="actions">
+        <select class="btn" id="discover-queries">
+          <option value="">All queries (~10 searches)</option>
+          <option value="3">Quick (3 searches)</option>
+          <option value="5">Medium (5 searches)</option>
+        </select>
+        <button class="btn btn-primary" onclick="runDiscovery()">Search Google</button>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="label">Target University</div>
+        <div class="value text-sm">University of Melbourne</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Graduation Years</div>
+        <div class="value text-sm">2015 - 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Fields</div>
+        <div class="value text-sm">CS / Engineering / IT</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Looking For</div>
+        <div class="value text-sm">Founders / CEOs / CTOs</div>
+      </div>
+    </div>
+
+    <div id="discover-results">
+      <div class="table-container" style="padding:24px">
+        <div style="text-align:center;padding:32px">
+          <div style="font-size:48px;margin-bottom:16px">&#128270;</div>
+          <h3>Ready to Discover</h3>
+          <p class="text-sm text-muted" style="max-width:480px;margin:8px auto 0">
+            Click "Search Google" to find UniMelb Computer Science and Engineering alumni
+            who are founders, CEOs, or CTOs. Results are parsed from LinkedIn profiles
+            and news articles via the Serper.dev API.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function runDiscovery() {
+  const container = document.getElementById('discover-results');
+  const maxQ = document.getElementById('discover-queries').value;
+  container.innerHTML = `
+    <div class="table-container" style="padding:48px;text-align:center">
+      <div class="spinner"></div>
+      <p class="text-muted" style="margin-top:16px">Searching Google for UniMelb alumni founders...</p>
+      <p class="text-sm text-muted">This may take 10-30 seconds depending on the number of queries.</p>
+    </div>
+  `;
+
+  try {
+    const results = await API.runDiscovery(maxQ ? parseInt(maxQ) : null);
+    discoveryResults = results;
+    renderDiscoveryResults(results);
+    toast(`Found ${results.total_candidates} candidates from ${results.queries_run} searches`, 'success');
+  } catch (e) {
+    container.innerHTML = `
+      <div class="table-container" style="padding:24px">
+        <div style="color:var(--red);padding:16px;background:var(--red-bg);border-radius:var(--radius)">
+          <strong>Discovery failed</strong>
+          <p class="text-sm" style="margin-top:4px">${esc(e.message)}</p>
+          <p class="text-sm text-muted" style="margin-top:8px">Make sure SERPER_API_KEY is set as an environment variable.</p>
+        </div>
+      </div>
+    `;
+    toast('Discovery failed: ' + e.message, 'error');
+  }
+}
+
+function renderDiscoveryResults(results) {
+  const container = document.getElementById('discover-results');
+  const { candidates, news_mentions } = results;
+
+  container.innerHTML = `
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+      <div class="stat-card">
+        <div class="label">People Found</div>
+        <div class="value" style="color:var(--green)">${candidates.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Founders / CEOs</div>
+        <div class="value" style="color:var(--accent)">${candidates.filter(c => c.is_founder).length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Degree Match</div>
+        <div class="value" style="color:var(--cyan)">${candidates.filter(c => c.has_degree_match).length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">News Mentions</div>
+        <div class="value">${news_mentions.length}</div>
+      </div>
+    </div>
+
+    ${candidates.length > 0 ? `
+      <div class="table-container" style="margin-bottom:20px">
+        <div class="table-header">
+          <h3>Discovered Candidates</h3>
+          <div class="actions">
+            <button class="btn" onclick="selectAllCandidates()">Select All</button>
+            <button class="btn" onclick="deselectAllCandidates()">Deselect All</button>
+            <button class="btn btn-primary" onclick="importSelectedCandidates()">Import Selected</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" id="select-all-cb" onchange="toggleAllCandidates(this.checked)"></th>
+            <th>Name</th>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Degree</th>
+            <th>Category</th>
+            <th>LinkedIn</th>
+          </tr></thead>
+          <tbody>
+            ${candidates.map((c, i) => `
+              <tr>
+                <td><input type="checkbox" class="candidate-cb" data-idx="${i}" ${c.is_founder ? 'checked' : ''}></td>
+                <td>
+                  <div class="alumni-name">
+                    <div class="avatar ${c.category}">${(c.first_name[0] || '') + (c.last_name[0] || '')}</div>
+                    <div class="name-info">
+                      <div class="name">${esc(c.first_name)} ${esc(c.last_name)}</div>
+                      <div class="company text-sm text-muted">${esc(c.snippet.slice(0, 100))}${c.snippet.length > 100 ? '...' : ''}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-sm">${esc(c.current_title || '-')}</td>
+                <td class="text-sm">${esc(c.current_company || '-')}</td>
+                <td class="text-sm text-muted">${[c.location_city, c.location_country].filter(Boolean).join(', ') || '-'}</td>
+                <td class="text-sm">${esc(c.degree || '-')}</td>
+                <td><span class="tag tag-${c.category}">${capitalize(c.category)}</span></td>
+                <td class="text-sm">
+                  ${c.linkedin_url ? `<a href="${esc(c.linkedin_url)}" target="_blank" style="color:var(--accent)">Profile</a>` : '-'}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : ''}
+
+    ${news_mentions.length > 0 ? `
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Related News & Articles</h3>
+        </div>
+        <div class="signal-feed">
+          ${news_mentions.slice(0, 20).map(n => `
+            <div class="signal-item">
+              <div class="signal-icon">&#128240;</div>
+              <div class="signal-content">
+                <div class="signal-title">
+                  <a href="${esc(n.url)}" target="_blank" style="color:var(--text)">${esc(n.title)}</a>
+                </div>
+                ${n.snippet ? `<div class="signal-desc">${esc(n.snippet)}</div>` : ''}
+                <div class="signal-meta">
+                  ${n.source ? `<span class="source">${esc(n.source)}</span>` : ''}
+                  ${n.date ? `<span class="time">${esc(n.date)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function toggleAllCandidates(checked) {
+  document.querySelectorAll('.candidate-cb').forEach(cb => cb.checked = checked);
+}
+
+function selectAllCandidates() {
+  toggleAllCandidates(true);
+  const selectAll = document.getElementById('select-all-cb');
+  if (selectAll) selectAll.checked = true;
+}
+
+function deselectAllCandidates() {
+  toggleAllCandidates(false);
+  const selectAll = document.getElementById('select-all-cb');
+  if (selectAll) selectAll.checked = false;
+}
+
+async function importSelectedCandidates() {
+  if (!discoveryResults) return;
+
+  const checkboxes = document.querySelectorAll('.candidate-cb:checked');
+  const indices = [...checkboxes].map(cb => parseInt(cb.dataset.idx));
+  const selected = indices.map(i => discoveryResults.candidates[i]);
+
+  if (selected.length === 0) {
+    toast('No candidates selected', 'error');
+    return;
+  }
+
+  try {
+    const result = await API.importDiscovered(selected);
+    toast(`Imported ${result.imported} alumni (${result.skipped} skipped/duplicates)`, 'success');
+    updateSidebarCounts();
+  } catch (e) {
+    toast('Import failed: ' + e.message, 'error');
+  }
 }
 
 // ── Import Page ──────────────────────────────────────────────────────────────
