@@ -1,0 +1,17 @@
+{
+  "name": "tin-alley-dashboard",
+  "version": "1.0.0",
+  "description": "Alumni Founder & Fundraising Signal Dashboard for Tin Alley Ventures",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "csv-parse": "^5.6.0"
+  }
+}

@@ -34,3 +34,8 @@ Thumbs.db
 tmp/
 temp/
 .tmp/
+
+# Dashboard data (generated at runtime)
+dashboard/data/*.sqlite
+dashboard/data/*.sqlite-wal
+dashboard/data/*.sqlite-shm
