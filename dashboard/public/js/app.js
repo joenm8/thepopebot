@@ -1253,6 +1253,12 @@ async function renderSources() {
               <p class="text-sm font-mono">SERPER_API_KEY=your_key</p>
               <p class="text-sm text-muted" style="margin-top:4px">Go to Discover Alumni page to run searches</p>
             </div>
+            <div style="background:var(--bg-input);padding:16px;border-radius:var(--radius)">
+              <h4 style="color:var(--accent);margin-bottom:8px;font-size:14px">People Data Labs (Enrichment)</h4>
+              <p class="text-sm text-muted" style="margin-bottom:8px">100 free lookups/month. Enriches profiles with career history &amp; education.</p>
+              <p class="text-sm font-mono">PDL_API_KEY=your_key</p>
+              <p class="text-sm text-muted" style="margin-top:4px">Sign up: peopledatalabs.com/signup</p>
+            </div>
           </div>
         </div>
       </div>

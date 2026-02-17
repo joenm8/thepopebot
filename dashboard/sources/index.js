@@ -19,6 +19,7 @@ const webMonitor = require('./web-monitor');
 const alumniDiscovery = require('./alumni-discovery');
 const hackernews = require('./hackernews');
 const producthunt = require('./producthunt');
+const enrichment = require('./enrichment');
 
 const sources = {
   linkedin,
@@ -30,6 +31,7 @@ const sources = {
   alumni_discovery: alumniDiscovery,
   hackernews,
   producthunt,
+  enrichment,
 };
 
 /**
