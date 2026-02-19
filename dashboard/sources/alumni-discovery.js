@@ -159,8 +159,13 @@ function parseLinkedInResult(result) {
     }
   }
 
-  // Detect if founder/CEO from title or snippet
+  // Verify University of Melbourne affiliation appears in the result
   const fullText = `${title} ${snippet}`.toLowerCase();
+  const unimelb = fullText.includes('university of melbourne') || fullText.includes('unimelb')
+    || fullText.includes('melb uni') || fullText.includes('melbourne university');
+  if (!unimelb) return null;
+
+  // Detect if founder/CEO from title or snippet
   const isFounder = TITLE_KEYWORDS.some(k => fullText.includes(k.toLowerCase()));
   const hasDegreeMatch = DEGREE_KEYWORDS.some(k => fullText.includes(k.toLowerCase()));
 
