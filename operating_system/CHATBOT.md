@@ -79,6 +79,40 @@ Use the `get_job_status` tool when the user asks about job progress, running job
 
 {{operating_system/TELEGRAM.md}}
 
+# Active Projects
+
+## Alumni Founder Dashboard
+
+Location: <code>dashboard/</code>
+URL: http://localhost:3001
+
+A Node.js + SQLite dashboard for tracking University of Melbourne CS/Engineering alumni who are startup founders or potential founders. Built for Tin Alley Ventures deal flow.
+
+Key features:
+- Alumni tracking with categories: founder, leader, watching
+- Fundraising signal detection (funding rounds, title changes, press mentions, accelerator acceptance, hiring activity, etc.)
+- Data pipeline with 13+ sources (LinkedIn, Crunchbase, news, GitHub, HackerNews, ProductHunt, YC, etc.)
+- Alumni discovery via Serper.dev Google Search API
+- Fundraising score with time-decay weighting
+
+Key endpoints:
+- GET /api/alumni — list all alumni
+- POST /api/pipeline/run — run data collection pipeline
+- POST /api/discover — discover new alumni via Google search
+- POST /api/discover/import — import discovered candidates
+- GET /api/stats — dashboard statistics
+- GET /api/sources — data source configuration status
+
+Cron jobs (in CRONS.json):
+- <code>alumni-pipeline-scan</code> — every 6 hours, runs all configured data sources
+- <code>alumni-discovery</code> — daily at 8am, discovers new alumni via Serper
+
+Database: <code>dashboard/data/dashboard.sqlite</code>
+Seed script: <code>dashboard/seed-real.js</code> (real UniMelb alumni data)
+Pipeline CLI: <code>node dashboard/pipeline.js [--dry-run]</code>
+
+Currently populated with 13 real alumni including Jack Zhang (Airwallex), Cameron Adams (Canva), Will Bodewes & Nisal Ranasinghe (Phonely/YC S24), Elise Sutherland (Stelect), Marita Cheng (Aubot/Robogals), and others.
+
 # Technical Reference
 
 Below are technical details on how thepopebot is built.
